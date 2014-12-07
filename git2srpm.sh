@@ -5,8 +5,9 @@
 WORKING_DIR=.
 OUTPUT_DIR=.
 GIT_HASH=master
-DIST=f21
+DIST=".fc21"
 RESULT_FULL_PATH=true
+SCRIPTS_PATH=$(dirname $0)
 
 usage() {
     echo "Usage: `basename $0` --git giturl [ --wd workdir ] [ --od outdir ]"
@@ -72,10 +73,17 @@ pushd "$GIT_DIR" &>/dev/null
 git checkout "$GIT_HASH" >&2 || abort "Could not checkout 'GIT_HASH'"
 
 touch sources || abort "Could not touch 'sources' file"
-fedpkg --dist "$DIST" srpm | tee srpmbuild.log >&2
 
-srpm=$(cat srpmbuild.log | grep -e '^Wrote: ' | sed -e 's/Wrote: //')
-srpmname=$(basename $srpm)
+# This should do the same as
+# fedpkg --dist "$DIST" srpm | tee srpmbuild.log >&2
+$SCRIPTS_PATH/getsource.py | tee srpmbuild.log >&2
+specfile=$(ls *.spec | head -n 1)
+rpmbuild -bs --define '_sourcedir .' --define '_specdir .' \
+             --define '_srcrpmdir .' --define "dist $DIST" "$specfile"  | tee srpmbuild2.log >&2
+
+srpm=$(cat srpmbuild2.log | grep -e '^Wrote: ' | sed -e 's/Wrote: //')
+srpm=$(readlink -f "$srpm")
+srpmname=$(basename "$srpm")
 
 popd &>/dev/null
 
