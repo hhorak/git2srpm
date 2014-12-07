@@ -55,7 +55,7 @@ def application(environ, start_response):
         ctype = 'text/html'
         tvalues = {}
         tvalues['name'] = 'Doe'
-        tfile = 'templates/example.html'
+        tfile = 'templates/homepage.html'
         try:
             with open(tfile, 'r') as t:
                 template = Template(t.read())
