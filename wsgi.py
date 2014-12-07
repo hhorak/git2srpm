@@ -55,7 +55,10 @@ def application(environ, start_response):
         ctype = 'text/html'
         tvalues = {}
         tvalues['name'] = 'Doe'
-        tfile = 'templates/homepage.html'
+        if 'DOCUMENT_ROOT' in environ:
+            tfile = environ['DOCUMENT_ROOT'] + 'templates/homepage.html'
+        else:
+            tfile = 'templates/homepage.html'
         try:
             with open(tfile, 'r') as t:
                 template = Template(t.read())
