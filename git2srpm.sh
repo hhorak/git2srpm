@@ -78,8 +78,15 @@ touch sources || abort "Could not touch 'sources' file"
 # fedpkg --dist "$DIST" srpm | tee srpmbuild.log >&2
 $SCRIPTS_PATH/getsource.py | tee srpmbuild.log >&2
 specfile=$(ls *.spec | head -n 1)
-/usr/bin/rpmbuild -bs --define '_sourcedir .' --define '_specdir .' \
-             --define '_srcrpmdir .' --define "dist $DIST" "$specfile"  | tee srpmbuild2.log >&2
+/usr/bin/rpmbuild -bs --define '_sourcedir .' \
+                      --define '_specdir .' \
+                      --define '_srcrpmdir .' \
+                      --define "dist $DIST" \
+                      --define '_builddir .' \
+                      --define '_rpmdir .' \
+                      --define '_topdir .' \
+                      --define '_buildrootdir .' \
+                      "$specfile"  | tee srpmbuild2.log >&2
 
 srpm=$(cat srpmbuild2.log | grep -e '^Wrote: ' | sed -e 's/Wrote: //')
 srpm=$(readlink -f "$srpm")
