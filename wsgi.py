@@ -21,7 +21,7 @@ def get_path(environ, path):
     return os.path.join(environ.get('DOCUMENT_ROOT', ''), path)
 
 def get_template(environ, filename, tvalues):
-
+    tvalues['space_used'] = subprocess.check_output("du --max-depth 0 -h {0} | cut -f1".format('.'), shell=True).decode('utf-8')
     env = jinja2.environment.Environment()
     env.loader = jinja2.FileSystemLoader(get_path(environ, TEMPLATES_DIR))
     template = env.get_template(filename)
