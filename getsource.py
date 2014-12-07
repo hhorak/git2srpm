@@ -60,7 +60,7 @@ def download_sources(outdir=None, cache_url=DEFAULT_URL, component=None):
     try:
         archives = open(os.path.join('.', 'sources'),
                         'r').readlines()
-    except IOError, e:
+    except IOError as e:
         raise Exception('This is not a valid repo: %s' % (e,))
     # Default to putting the files where the module is
     if not outdir:
