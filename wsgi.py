@@ -6,40 +6,69 @@ import urllib.parse
 import json
 import subprocess
 
+WORKING_DIR='./working'
+OUTPUT_DIR='./srpms'
+TEMPLATES_DIR='./templates'
+
 def run_sh(cmd, args):
     """
     Runs command in default shell with specified arguments.
     Results are returned as (exit_code, stdout, stderr)
     """
+    pass
 
-def gen_srpm(query):
-    response_body = "parsing data..."
+def get_path(environ, path):
+    return os.path.join(environ.get('DOCUMENT_ROOT', ''), path)
 
+def get_template(environ, filename, tvalues):
+    tfile = os.path.join(get_path(environ, TEMPLATES_DIR), filename)
+    try:
+        with open(tfile, 'r') as t:
+            template = Template(t.read())
+        return template.render(tvalues)
+    except (OSError, IOError) as e:
+        return 'Error: Could not open template file {}'.format(tfile)
+
+def report_error(environ, errors):
+    tvalues = {'errors': errors}
+    return get_template(environ, 'error.html', tvalues)
+
+def report_info(environ, messages):
+    tvalues = {'messages': messages}
+    return get_template(environ, 'info.html', tvalues)
+
+
+def gen_srpm(environ):
     #POST:
     #length = int(environ.get('CONTENT_LENGTH', '0'))
     #body = environ['wsgi.input'].read(length).decode('utf-8')
     #data = urllib.parse.parse_qs(body)
-    data = urllib.parse.parse_qs(query)
+    data = urllib.parse.parse_qs(environ['QUERY_STRING'])
     try:
-        args = ['echo', '===', './git2srpm.sh', '--git', data['giturl'][0]]
+        args = [os.path.join(get_path(environ, '.'), 'git2srpm.sh'), '--result-filename', '--git', data['giturl'][0], '--wd', get_path(environ, WORKING_DIR), '--od', get_path(environ, OUTPUT_DIR)]
     except KeyError:
-        response_body = 'Missing argument "giturl".'
-        return response_body
+        status = '404 Not found'
+        return report_error(environ, ['Missing argument "giturl".'])
 
     if 'githash' in data:
         args.extend(data['githash'])
     out_json = subprocess.check_output(args).decode('utf-8')
-    response_body += 'raw output: ' + out_json
+    response_body = 'raw output: ' + out_json
     try:
         output = json.loads(out_json)
         response_body += output['srpm']
     except (KeyError, ValueError):
-        response_body += 'error parsing json output of git2srpm.sh'
-    return response_body
+        return response_body + 'error parsing json output of git2srpm.sh'
+
+    final_url = environ['HTTP_HOST'] + '/srpm/' + output['srpm']
+    messages = ['Source RPM generated successfully, use url {0}'.format(final_url)]
+    return report_info(environ, messages)
+
 
 def application(environ, start_response):
 
-    ctype = 'text/plain'
+    ctype = 'text/html'
+    status = '200 OK'
     if environ['PATH_INFO'] == '/health':
         response_body = "1"
     elif environ['PATH_INFO'] == '/env':
@@ -48,29 +77,30 @@ def application(environ, start_response):
         response_body = '\n'.join(response_body)
     elif environ['PATH_INFO'][0:6] == '/srpm/':
         srpm = environ['PATH_INFO'][6:]
-        response_body = "Returning srpm {}".format(srpm)
+        srpm_file = os.path.join(get_path(environ, OUTPUT_DIR), srpm)
+        try:
+            with open(srpm_file, 'rb') as f:
+                response_body = f.read()
+            ctype = 'application/octet-stream'
+        except (OSError, IOError) as e:
+            status = '404 Not found'
+            response_body = report_error(environ, ['Given source RPM "{}" has not been found.'.format(srpm) ])
+
     elif environ['PATH_INFO'] == '/gen-srpm':
-        response_body = gen_srpm(environ['QUERY_STRING'])
+        response_body = gen_srpm(environ)
     else:
         ctype = 'text/html'
         tvalues = {}
         tvalues['name'] = 'Doe'
-        if 'DOCUMENT_ROOT' in environ:
-            tfile = environ['DOCUMENT_ROOT'] + 'templates/homepage.html'
-        else:
-            tfile = 'templates/homepage.html'
-        try:
-            with open(tfile, 'r') as t:
-                template = Template(t.read())
-            response_body = template.render(tvalues)
-        except (OSError, IOError) as e:
-            response_body = 'Could not open template file {}'.format(tformat)
+        response_body = get_template(environ, 'homepage.html', tvalues)
 
-    status = '200 OK'
     response_headers = [('Content-Type', ctype), ('Content-Length', str(len(response_body)))]
     #
     start_response(status, response_headers)
-    return [response_body.encode('utf-8') ]
+    if ctype[0:4] == 'text':
+        return [response_body.encode('utf-8') ]
+    else:
+        return [response_body ]
 
 #
 # Below for testing only
