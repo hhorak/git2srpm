@@ -64,34 +64,17 @@ def gen_srpm(environ):
 
 def application(environ, start_response):
 
-    ctype = 'text/html'
+    ctype = 'text/plain'
     status = '200 OK'
 
     if environ['PATH_INFO'] == '/health':
         response_body = "1"
+
     elif environ['PATH_INFO'] == '/env':
         response_body = ['%s: %s' % (key, value)
                     for key, value in sorted(environ.items())]
         response_body = '\n'.join(response_body)
-    elif environ['PATH_INFO'][0:5] == '/css/' or environ['PATH_INFO'][0:4] == '/js/':
-        ctype = 'text/css'
-        fullpath = os.path.join(get_path(environ, '.'), environ['PATH_INFO'][1:])
-        try:
-            with open(fullpath, 'r') as f:
-                response_body = f.read()
-        except (OSError, IOError) as e:
-            status = '404 Not found'
-            response_body = report_error(environ, ['Requested file "{0}" has not been found.'.format(fullpath) ])
-    elif environ['PATH_INFO'][0:7] == '/fonts/':
-        ctype = 'text/plain'
-        fullpath = os.path.join(get_path(environ, '.'), environ['PATH_INFO'][1:])
-        try:
-            with open(fullpath, 'rb') as f:
-                response_body = f.read()
-            ctype = 'application/x-opentype'
-        except (OSError, IOError) as e:
-            status = '404 Not found'
-            response_body = report_error(environ, ['Given font RPM "{}" has not been found.'.format(fullpath) ])
+
     elif environ['PATH_INFO'][0:6] == '/srpm/':
         srpm = environ['PATH_INFO'][6:]
         srpm_file = os.path.join(get_path(environ, OUTPUT_DIR), srpm)
@@ -105,10 +88,29 @@ def application(environ, start_response):
 
     elif environ['PATH_INFO'] == '/gen-srpm':
         response_body = gen_srpm(environ)
-    else:
+
+    elif environ['PATH_INFO'] == '/':
         ctype = 'text/html'
         tvalues = {}
         response_body = get_template(environ, 'homepage.html', tvalues)
+
+    else:
+        ctype = 'text/plain'
+        fullpath = os.path.join(get_path(environ, '.'), environ['PATH_INFO'][1:])
+        try:
+            fmode = 'r'
+            if environ['PATH_INFO'][-4:] == '.css':
+                ctype = 'text/css'
+            elif environ['PATH_INFO'][-3:] == '.js':
+                ctype = 'text/javascript'
+            else:
+                ctype = 'application/x-opentype'
+                fmode = 'rb'
+            with open(fullpath, fmode) as f:
+                response_body = f.read()
+        except (OSError, IOError) as e:
+            status = '404 Not found'
+            response_body = report_error(environ, ['Given path "{}" has not been found.'.format(fullpath) ])
 
     response_headers = [('Content-Type', ctype), ('Content-Length', str(len(response_body)))]
     #
