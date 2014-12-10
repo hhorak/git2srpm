@@ -98,14 +98,13 @@ def application(environ, start_response):
         ctype = 'text/plain'
         fullpath = os.path.join(get_path(environ, '.'), environ['PATH_INFO'][1:])
         try:
-            fmode = 'r'
+            fmode = 'rb'
             if environ['PATH_INFO'][-4:] == '.css':
                 ctype = 'text/css'
             elif environ['PATH_INFO'][-3:] == '.js':
                 ctype = 'text/javascript'
             else:
                 ctype = 'application/x-opentype'
-                fmode = 'rb'
             with open(fullpath, fmode) as f:
                 response_body = f.read()
         except (OSError, IOError) as e:
