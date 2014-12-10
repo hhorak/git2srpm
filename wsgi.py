@@ -100,9 +100,9 @@ def application(environ, start_response):
         try:
             fmode = 'rb'
             if environ['PATH_INFO'][-4:] == '.css':
-                ctype = 'text/css'
+                ctype = 'application/x-opentype'
             elif environ['PATH_INFO'][-3:] == '.js':
-                ctype = 'text/javascript'
+                ctype = 'application/x-opentype'
             else:
                 ctype = 'application/x-opentype'
             with open(fullpath, fmode) as f:
