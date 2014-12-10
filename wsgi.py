@@ -73,6 +73,25 @@ def application(environ, start_response):
         response_body = ['%s: %s' % (key, value)
                     for key, value in sorted(environ.items())]
         response_body = '\n'.join(response_body)
+    elif environ['PATH_INFO'][0:5] == '/css/' or environ['PATH_INFO'][0:4] == '/js/':
+        ctype = 'text/css'
+        fullpath = os.path.join(get_path(environ, '.'), environ['PATH_INFO'][1:])
+        try:
+            with open(fullpath, 'r') as f:
+                response_body = f.read()
+        except (OSError, IOError) as e:
+            status = '404 Not found'
+            response_body = report_error(environ, ['Requested file "{0}" has not been found.'.format(fullpath) ])
+    elif environ['PATH_INFO'][0:7] == '/fonts/':
+        ctype = 'text/plain'
+        fullpath = os.path.join(get_path(environ, '.'), environ['PATH_INFO'][1:])
+        try:
+            with open(fullpath, 'rb') as f:
+                response_body = f.read()
+            ctype = 'application/x-opentype'
+        except (OSError, IOError) as e:
+            status = '404 Not found'
+            response_body = report_error(environ, ['Given font RPM "{}" has not been found.'.format(fullpath) ])
     elif environ['PATH_INFO'][0:6] == '/srpm/':
         srpm = environ['PATH_INFO'][6:]
         srpm_file = os.path.join(get_path(environ, OUTPUT_DIR), srpm)

@@ -3,19 +3,56 @@
 
 {% block content %}
 
-<h2>Quick generation</h2>
-<form action="gen-srpm" method="get">
-<input type="text" value="" name="giturl" />
-<button type="submit">Generate SRPM now</button>
-</form>
+		<!-- Banner -->
+			<section id="banner">
+				<div class="inner">
+					<h2>git2srpm</h2>
+					<p>Simple tool to generate SRPM from git repository
+                                        and using lookaside cache from Fedora.</p>
+					<ul class="actions">
+						<li><a href="#content" class="button big special">Generate</a></li>
+						<li><a href="#elements" class="button big alt">Find</a></li>
+					</ul>
+				</div>
+			</section>
 
-<h2>What is this for</h2>
-<p>This is a simple tool to generate SRPM from git repository
-and using lookaside cache from Fedora.</p>
-
-<h2>How to use it</h2>
-<p>If you have git repository somewhere that follows structure of Fedora
-component repository, just use the link and then download generated SRPM.</p>
+		<!-- One -->
+			<section id="one" class="wrapper style1">
+				<header class="major">
+					<h2>Generate</h2>
+					<p>Enter valid git repository url</p>
+				</header>
+				<div class="container">
+					<div class="row">
+						<div class="4u">
+							<section class="special box">
+								<h3>1. Submit git repo</h3>
+								<p>Enter any public git repository that includes one SPEC file.</p>
+							</section>
+						</div>
+						<div class="4u">
+							<section class="special box">
+								<h3>2. See link</h3>
+								<p>From the git repository a SRPM is generated and link to this file is provided.</p>
+							</section>
+						</div>
+						<div class="4u">
+							<section class="special box">
+								<h3>3. Use in copr</h3>
+								<p>The provided link can then be used in copr</p>
+							</section>
+						</div>
+					</div>
+					<form action="gen-srpm" method="get">
+					<fieldset>
+						<div align="center">
+						<input type="text" value="https://github.com/project/reponame.git" name="giturl" /><p></p>
+						<button type="submit" class="button big special">Generate</button>
+						</div>
+					</fieldset>
+					</form>
+				</div>
+			</section>
 
 {% endblock %}
 
