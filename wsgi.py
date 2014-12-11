@@ -74,8 +74,10 @@ def find(environ):
     except KeyError:
         status = '404 Not found'
         return report_error(environ, ['Missing argument which to search.'])
-
-    srpms = [ os.path.basename(f) for f in glob.glob("{0}/*{1}*src.rpm".format(get_path(environ, OUTPUT_DIR), query.replace(' ', '*'))) ]
+    try:
+        srpms = [ os.path.basename(f) for f in glob.glob("{0}/*{1}*src.rpm".format(get_path(environ, OUTPUT_DIR), query.replace(' ', '*'))) ]
+    except FileNotFoundError:
+        srpms = []
     tvalues = {'srpms':srpms, 'headline': 'Search for {0}'.format(query)}
     return get_template(environ, 'list.html', tvalues)
 
@@ -106,7 +108,10 @@ def application(environ, start_response):
 
     elif environ['PATH_INFO'][0:5] == '/list':
         ctype = 'text/html'
-        srpms = [ get_srpm_url(environ, str(file)) for file in os.listdir(get_path(environ, OUTPUT_DIR))]
+        try:
+            srpms = [ get_srpm_url(environ, str(file)) for file in os.listdir(get_path(environ, OUTPUT_DIR))]
+        except FileNotFoundError:
+            srpms = []
         tvalues = {'srpms':srpms, 'headline': 'List of all srpms'}
         response_body = get_template(environ, 'list.html', tvalues)
 
