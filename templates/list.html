@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}List of all SRPMs{% endblock %}
+
+{% block content %}
+
+		<!-- One -->
+			<section id="one" class="wrapper style1">
+				<header class="major">
+					<h2>These are all srpm generated and available right now.</h2>
+				</header>
+				<div class="container">
+					<div class="row">
+					<ul>
+					{% for srpm in srpms %}
+					<li>{{ srpm }}</li>
+					{% endfor %}
+					</ul>
+					</div>
+				</div>
+			</section>
+
+{% endblock %}
+

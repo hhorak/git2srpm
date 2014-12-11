@@ -36,6 +36,10 @@ def report_info(environ, messages):
     return get_template(environ, 'info.html', tvalues)
 
 
+def get_srpm_url(environ, name):
+    return environ['wsgi.url_scheme'] + '://' + environ['HTTP_HOST'] + '/srpm/' + name
+
+
 def gen_srpm(environ):
     data = urllib.parse.parse_qs(environ['QUERY_STRING'])
     try:
@@ -57,7 +61,7 @@ def gen_srpm(environ):
     except (KeyError, ValueError):
         return response_body + 'error parsing json output of git2srpm.sh'
 
-    final_url = environ['wsgi.url_scheme'] + '://' + environ['HTTP_HOST'] + '/srpm/' + output['srpm']
+    final_url = get_srpm_url(environ, output['srpm'])
     tvalues = {'link': final_url}
     return get_template(environ, 'import_done.html', tvalues)
 
@@ -85,6 +89,12 @@ def application(environ, start_response):
         except (OSError, IOError) as e:
             status = '404 Not found'
             response_body = report_error(environ, ['Given source RPM "{}" has not been found.'.format(srpm) ])
+
+    elif environ['PATH_INFO'][0:5] == '/list':
+        ctype = 'text/html'
+        srpms = [ get_srpm_url(environ, str(file)) for file in os.listdir(get_path(environ, OUTPUT_DIR))]
+        tvalues = {'srpms':srpms}
+        response_body = get_template(environ, 'list.html', tvalues)
 
     elif environ['PATH_INFO'] == '/gen-srpm':
         response_body = gen_srpm(environ)
