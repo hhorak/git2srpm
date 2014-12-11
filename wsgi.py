@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import os
 import jinja2
-from io import StringIO
+import io
 import urllib.parse
 import json
 import subprocess
+import glob
 
 WORKING_DIR='./working'
 OUTPUT_DIR='./srpms'
@@ -66,6 +67,19 @@ def gen_srpm(environ):
     return get_template(environ, 'import_done.html', tvalues)
 
 
+def find(environ):
+    data = urllib.parse.parse_qs(environ['QUERY_STRING'])
+    try:
+        query = data['q'][0]
+    except KeyError:
+        status = '404 Not found'
+        return report_error(environ, ['Missing argument which to search.'])
+
+    srpms = [ os.path.basename(f) for f in glob.glob("{0}/*{1}*src.rpm".format(get_path(environ, OUTPUT_DIR), query.replace(' ', '*'))) ]
+    tvalues = {'srpms':srpms, 'headline': 'Search for {0}'.format(query)}
+    return get_template(environ, 'list.html', tvalues)
+
+
 def application(environ, start_response):
 
     ctype = 'text/plain'
@@ -93,10 +107,15 @@ def application(environ, start_response):
     elif environ['PATH_INFO'][0:5] == '/list':
         ctype = 'text/html'
         srpms = [ get_srpm_url(environ, str(file)) for file in os.listdir(get_path(environ, OUTPUT_DIR))]
-        tvalues = {'srpms':srpms}
+        tvalues = {'srpms':srpms, 'headline': 'List of all srpms'}
         response_body = get_template(environ, 'list.html', tvalues)
 
+    elif environ['PATH_INFO'][0:7] == '/search':
+        ctype = 'text/html'
+        response_body = find(environ)
+
     elif environ['PATH_INFO'] == '/gen-srpm':
+        ctype = 'text/html'
         response_body = gen_srpm(environ)
 
     elif environ['PATH_INFO'] == '/':

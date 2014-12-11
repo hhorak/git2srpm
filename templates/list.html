@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}List of all SRPMs{% endblock %}
+{% block title %}{{ headline }}{% endblock %}
 
 {% block content %}
 
@@ -13,6 +13,8 @@
 					<ul>
 					{% for srpm in srpms %}
 					<li>{{ srpm }}</li>
+					{% else %}
+					<li>No entries found.</li>
 					{% endfor %}
 					</ul>
 					</div>
