@@ -25,7 +25,7 @@ def get_template(environ, filename, tvalues):
     env = jinja2.environment.Environment()
     env.loader = jinja2.FileSystemLoader(get_path(environ, TEMPLATES_DIR))
     template = env.get_template(filename)
-    return template.render(tvalues)
+    return template.render(tvalues).encode('utf-8')
 
 def report_error(environ, errors):
     tvalues = {'errors': errors}
@@ -100,9 +100,9 @@ def application(environ, start_response):
         try:
             fmode = 'rb'
             if environ['PATH_INFO'][-4:] == '.css':
-                ctype = 'application/x-opentype'
+                ctype = 'text/css'
             elif environ['PATH_INFO'][-3:] == '.js':
-                ctype = 'application/x-opentype'
+                ctype = 'text/javascript'
             else:
                 ctype = 'application/x-opentype'
             with open(fullpath, fmode) as f:
@@ -114,10 +114,7 @@ def application(environ, start_response):
     response_headers = [('Content-Type', ctype), ('Content-Length', str(len(response_body)))]
     #
     start_response(status, response_headers)
-    if ctype[0:4] == 'text':
-        return [response_body.encode('utf-8') ]
-    else:
-        return [response_body ]
+    return [response_body ]
 
 #
 # Below for testing only
