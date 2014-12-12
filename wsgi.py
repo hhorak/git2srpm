@@ -8,7 +8,7 @@ import subprocess
 import glob
 
 WORKING_DIR='./working'
-OUTPUT_DIR='./srpms'
+OUTPUT_DIR='../data/srpms'
 TEMPLATES_DIR='./templates'
 
 def run_sh(cmd, args):

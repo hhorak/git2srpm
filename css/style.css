@@ -962,6 +962,29 @@
 						vertical-align: middle;
 					}
 
+					#banner form#search {
+			width: 100%;
+			height: inherit;
+			line-height: inherit;
+			position: absolute;
+			right: 1em;
+			top: 1em;
+			vertical-align: middle;
+text-align: right;
+						display: inline-block;
+					}
+
+					#banner form#search input, #banner form#search button{
+						display: inline-block;
+						position: relative;
+					}
+					#banner form#search input {
+						width: 20em;
+					}
+					#banner form#search button {
+						width: 5em;
+					}
+
 		#header .container {
 			position: relative;
 		}
@@ -978,12 +1001,12 @@
 
 	#banner {
 		background-color: #666666;
-		background-image: url("../images/banner.jpg");
+//		background-image: url("../images/banner.jpg");
 		background-size: cover;
 		background-position: center center;
 		background-repeat: no-repeat;
 		color: #d8d8d8;
-		padding: 14em 0;
+		padding: 8em 0;
 		text-align: center;
 		position: relative;
 	}
