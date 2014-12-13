@@ -22,22 +22,16 @@ class myapp(object):
         self.response_body = ''
         self.cache = False
 
-    def run_sh(cmd, args):
-        """
-        Runs command in default shell with specified arguments.
-        Results are returned as (exit_code, stdout, stderr)
-        """
-        pass
 
     def _get_path(self, path):
         return os.path.join(self.environ.get('DOCUMENT_ROOT', ''), path)
+
 
     def _get_du(self, path):
         out = subprocess.check_output("du --max-depth 0 -h {0} | cut -f1".format(path),
                                        shell=True).decode('utf-8')
         if not out:
             out = '0B'
-
         return out
 
 
@@ -45,6 +39,7 @@ class myapp(object):
         tvalues['space_used_wd'] = self._get_du(self._get_path(WORKING_DIR))
         tvalues['space_used_od'] = self._get_du(self._get_path(OUTPUT_DIR))
         return tvalues
+
 
     def _get_template(self, filename, tvalues):
         self.ctype = 'text/html'
@@ -54,9 +49,11 @@ class myapp(object):
         template = env.get_template(filename)
         return template.render(tvalues).encode('utf-8')
 
+
     def _report_error(self, errors=['Some unspecified error.']):
         tvalues = {'errors': errors}
         return self._get_template('error.html', tvalues)
+
 
     def _report_info(self, messages=['Some unspecified info.']):
         tvalues = {'messages': messages}
@@ -97,8 +94,7 @@ class myapp(object):
              self.response_body = response_body + 'error parsing json output of git2srpm.sh'
 
         final_url = self._get_srpm_url(output['srpm'])
-        tvalues = {'link': final_url}
-        self.response_body = self._get_template('import_done.html', tvalues)
+        self.response_body = self._report_info(['Source RPM generated successfully, use: <a href="{0}">{0}</a>'.format(final_url)])
 
 
     def action_find(self):
