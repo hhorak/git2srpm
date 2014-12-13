@@ -31,8 +31,14 @@ class myapp(object):
     def _get_path(self, path):
         return os.path.join(self.environ.get('DOCUMENT_ROOT', ''), path)
 
+    def _get_du(self, path):
+        return subprocess.check_output("du --max-depth 0 -h {0} | cut -f1".format(path),
+                                       shell=True).decode('utf-8')
+
+
     def _get_all_pages_values(self, tvalues={}):
-        tvalues['space_used'] = subprocess.check_output("du --max-depth 0 -h {0} | cut -f1".format(self._get_path('.')), shell=True).decode('utf-8')
+        tvalues['space_used_wd'] = self._get_du(self._get_path(WORKING_DIR))
+        tvalues['space_used_od'] = self._get_du(self._get_path(OUTPUT_DIR))
         return tvalues
 
     def _get_template(self, filename, tvalues):
