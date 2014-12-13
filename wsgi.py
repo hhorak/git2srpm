@@ -56,7 +56,7 @@ def gen_srpm(environ):
         args.extend(data['githash'])
     try:
         out_json = subprocess.check_output(args).decode('utf-8')
-    except CalledProcessError:
+    except subprocess.CalledProcessError:
         return report_error(environ,
                             ['Could not create SRPM from given git repository.',
                              'Check the link, content of the repository and if '
