@@ -70,13 +70,13 @@ mkdir -p $OUTPUT_DIR || abort "Could not create output dir '$OUTPUT_DIR', exitin
 
 # applying retention policy
 # remove all but $RETENTION_COUNT_WD last working dirs
-pushd $WORKING_DIR
+pushd $WORKING_DIR >/dev/null
 ls -ct | tail -n +$RETENTION_COUNT_WD | xargs rm -rf
-popd
+popd >/dev/null
 # remove all but $RETENTION_COUNT_SRPM last srpms dirs
-pushd $OUTPUT_DIR
+pushd $OUTPUT_DIR >/dev/null
 ls -ct | tail -n +$RETENTION_COUNT_SRPM | xargs rm -rf
-popd
+popd >/dev/null
 
 GIT_DIR=$(mktemp -d "$WORKING_DIR/gitXXXXXXXX")
 git clone "$GIT_URL" "$GIT_DIR" >&2 || abort "Could not clone git repo '$GIT_URL' to dir '$GIT_DIR'"
