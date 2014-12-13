@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Homepage{% endblock %}
+
+{% block content %}
+
+		<!-- Banner -->
+			<section id="banner">
+				<div class="inner">
+					<h2>git2srpm</h2>
+					<p>Simple tool to generate SRPM from git repository
+                                        and using lookaside cache from Fedora.</p>
+					<ul class="actions">
+						<li><a href="#gennewsrpm" class="button big special">Generate</a></li>
+						<li><a href="/list" class="button big alt">Search</a></li>
+					</ul>
+				</div>
+			</section>
+
+		<!-- One -->
+			<section id="one" class="wrapper style1">
+				<header class="major">
+					<h2>Generate</h2>
+					<p>Enter a valid git repository url that contains SRPM sources</p>
+				</header>
+				<div class="container" id="gennewsrpm">
+					<div class="row">
+						<div class="4u">
+							<section class="special box">
+								<h3>1. Submit git repo</h3>
+								<p>Enter link to any public git repository that includes one SPEC file and other SRPM sources.</p>
+							</section>
+						</div>
+						<div class="4u">
+							<section class="special box">
+								<h3>2. Get SRPM link</h3>
+								<p>This application generates a SRPM using lookaside cache from Fedora and gives you a link to SRPM.</p>
+							</section>
+						</div>
+						<div class="4u">
+							<section class="special box">
+								<h3>3. Use link in copr</h3>
+								<p>The provided link can then be used in <a href="http://copr.fedoraproject.org">copr project</a> to build your ad-hoc package.</p>
+							</section>
+						</div>
+					</div>
+					<form action="gen-srpm" method="get">
+					<fieldset>
+						<div align="center">
+						<input type="text" value="https://github.com/project/reponame.git" name="giturl" /><p></p>
+						<button type="submit" class="button big special">Generate</button>
+						</div>
+					</fieldset>
+					</form>
+				</div>
+			</section>
+
+{% endblock %}
+

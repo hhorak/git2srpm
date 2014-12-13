@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+<!--
+	Ion by TEMPLATED
+	templated.co @templatedco
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+	<head>
+		<title>git2srpm | Homepage</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<!--[if lte IE 8]><script src="js/html5shiv.js"></script><![endif]-->
+		<script src="js/jquery.min.js"></script>
+		<script src="js/skel.min.js"></script>
+		<script src="js/skel-layers.min.js"></script>
+		<script src="js/init.js"></script>
+		<noscript>
+			<link rel="stylesheet" href="css/skel.css" />
+			<link rel="stylesheet" href="css/style.css" />
+			<link rel="stylesheet" href="css/style-xlarge.css" />
+		</noscript>
+		<base href="/" />
+	</head>
+	<body id="top">
+
+		<!-- Header -->
+			<header id="header" class="skel-layers-fixed">
+				<h1><a href="#">git2srpm</a></h1>
+				<nav id="nav">
+					<ul>
+						<li><a href="index.html">Home</a></li>
+						<li><a href="left-sidebar.html">List</a></li>
+						<li><a href="right-sidebar.html">Generate</a></li>
+						<li><a href="no-sidebar.html">Find</a></li>
+					</ul>
+				</nav>
+			</header>
+
+
+		<!-- Banner -->
+			<section id="banner">
+				<div class="inner">
+					<h2>git2srpm</h2>
+					<p>Simple tool to generate SRPM from git repository
+and using lookaside cache from Fedora.</p>
+					<ul class="actions">
+						<li><a href="#content" class="button big special">Generate</a></li>
+						<li><a href="#elements" class="button big alt">Find</a></li>
+					</ul>
+				</div>
+			</section>
+
+		<!-- One -->
+			<section id="one" class="wrapper style1">
+				<header class="major">
+					<h2>Generate</h2>
+					<p>Enter valid git repository url</p>
+				</header>
+				<div class="container">
+					<div class="row">
+						<div class="4u">
+							<section class="special box">
+								<i class="icon fa-refresh major"></i>
+								<h3>1. Submit git repo</h3>
+								<p>Enter any public git repository that includes one SPEC file.</p>
+							</section>
+						</div>
+						<div class="4u">
+							<section class="special box">
+								<i class="icon fa-link major"></i>
+								<h3>2. See link</h3>
+								<p>From the git repository a SRPM is generated and link to this file is provided.</p>
+							</section>
+						</div>
+						<div class="4u">
+							<section class="special box">
+								<i class="icon fa-cog major"></i>
+								<h3>3. Use in copr</h3>
+								<p>The provided link can then be used in copr</p>
+							</section>
+						</div>
+					</div>
+					<form action="gen-srpm" method="get">
+					<fieldset>
+						<div align="center">
+						<input type="text" value="https://github.com/project/reponame.git" name="giturl" /><p></p>
+						<button type="submit" class="button big special">Generate</button>
+						</div>
+					</fieldset>
+					</form>
+				</div>
+			</section>
+
+
+		<!-- Footer -->
+			<footer id="footer">
+				<div class="container">
+					<ul class="copyright">
+						<li>This is a free software under GPLv2+</li>
+						<li>&copy; 2014 Honza Horak &lt;<a href="mailto: hhorak@redhat.com">hhorak@redhat.com</a>&gt;</li>
+						<li>Space used: 3.3M
+</li>
+						<li>All rights reserved.</li>
+						<li>Design: <a href="http://templated.co">TEMPLATED</a></li>
+						<li>Images: <a href="http://unsplash.com">Unsplash</a></li>
+					</ul>
+				</div>
+			</footer>
+
+	</body>
+</html>

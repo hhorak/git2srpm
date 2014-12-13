@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ headline }}{% endblock %}
+
+{% block content %}
+
+		<!-- One -->
+			<section id="one" class="wrapper style1">
+				<header class="major">
+					<h2>{{ headline }}</h2>
+					<p><a href="/#gennewsrpm">Submit a new SRPM</a> if you have not found what you search for.</p>
+				</header>
+				<div class="container">
+					<div class="row">
+					<ul>
+					{% for srpm in srpms %}
+					<li><a href="{{ srpm }}">{{ srpm }}</a></li>
+					{% else %}
+					<li>No entries found.</li>
+					{% endfor %}
+					</ul>
+					</div>
+				</div>
+			</section>
+
+{% endblock %}
+
