@@ -32,8 +32,12 @@ class myapp(object):
         return os.path.join(self.environ.get('DOCUMENT_ROOT', ''), path)
 
     def _get_du(self, path):
-        return subprocess.check_output("du --max-depth 0 -h {0} | cut -f1".format(path),
+        out = subprocess.check_output("du --max-depth 0 -h {0} | cut -f1".format(path),
                                        shell=True).decode('utf-8')
+        if not out:
+            out = '0B'
+
+        return out
 
 
     def _get_all_pages_values(self, tvalues={}):
