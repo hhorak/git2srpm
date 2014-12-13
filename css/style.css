@@ -148,6 +148,26 @@
 		text-align: right;
 	}
 
+	ul.info li, ul.error li {
+		list-style: none;
+	}
+
+	ul.info {
+		background: rgba(100, 185, 90, 0.175);
+		border-radius: 6px;
+		border: none;
+		border: solid 1px rgba(100, 185, 90, 0.4);
+		padding: 1em;
+	}
+
+	ul.error {
+		background: rgba(185, 100, 90, 0.175);
+		border-radius: 6px;
+		border: none;
+		border: solid 1px rgba(185, 100, 90, 0.4);
+		padding: 1em;
+	}
+
 /* Section/Article */
 
 	section.special, article.special {
@@ -962,29 +982,6 @@
 						vertical-align: middle;
 					}
 
-					#banner form#search {
-			width: 100%;
-			height: inherit;
-			line-height: inherit;
-			position: absolute;
-			right: 1em;
-			top: 1em;
-			vertical-align: middle;
-text-align: right;
-						display: inline-block;
-					}
-
-					#banner form#search input, #banner form#search button{
-						display: inline-block;
-						position: relative;
-					}
-					#banner form#search input {
-						width: 20em;
-					}
-					#banner form#search button {
-						width: 5em;
-					}
-
 		#header .container {
 			position: relative;
 		}
@@ -1001,7 +998,7 @@ text-align: right;
 
 	#banner {
 		background-color: #666666;
-//		background-image: url("../images/banner.jpg");
+		background-image: url("../images/back1.jpg");
 		background-size: cover;
 		background-position: center center;
 		background-repeat: no-repeat;
@@ -1018,7 +1015,7 @@ text-align: right;
 			top: 0;
 			width: 100%;
 			height: 100%;
-			background: rgba(64, 72, 80, 0.25);
+			background: rgba(64, 72, 80, 0.5);
 		}
 
 		#banner .inner {
@@ -1070,6 +1067,32 @@ text-align: right;
 			#banner p a {
 				color: #ffffff;
 				text-decoration: none;
+			}
+
+
+			#banner form#search {
+				width: 100%;
+				height: inherit;
+				line-height: inherit;
+				position: absolute;
+				right: 1em;
+				top: 1em;
+				vertical-align: middle;
+				text-align: right;
+				display: inline-block;
+			}
+
+			#banner form#search input, #banner form#search button{
+				display: inline-block;
+				position: relative;
+			}
+
+			#banner form#search input {
+				width: 20em;
+			}
+
+			#banner form#search button {
+				width: 5em;
 			}
 
 /* Footer */

@@ -7,13 +7,13 @@
 			<section id="one" class="wrapper style1">
 				<header class="major">
 					<h2>{{ headline }}</h2>
-					<p>Submit a new one of not found what you search for.</p>
+					<p><a href="/#gennewsrpm">Submit a new SRPM</a> if you have not found what you search for.</p>
 				</header>
 				<div class="container">
 					<div class="row">
 					<ul>
 					{% for srpm in srpms %}
-					<li>{{ srpm }}</li>
+					<li><a href="{{ srpm }}">{{ srpm }}</a></li>
 					{% else %}
 					<li>No entries found.</li>
 					{% endfor %}

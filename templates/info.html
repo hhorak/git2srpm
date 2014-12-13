@@ -2,9 +2,15 @@
 {% block title %}Info{% endblock %}
 
 {% block content %}
+		<section id="info" class="wrapper style1">
+			<div class="container">
+				<ul>
 <ul>
 {% for message in messages %}
 <li>{{ message }}</li>
 {% endfor %}
 </ul>
+			</div>
+		</section>
 {% endblock %}
+
