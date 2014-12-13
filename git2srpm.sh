@@ -8,6 +8,8 @@ GIT_HASH=master
 DIST=".fc21"
 RESULT_FULL_PATH=true
 SCRIPTS_PATH=$(readlink -f `dirname $0`)
+RETENTION_COUNT_SRPM=20
+RETENTION_COUNT_WD=5
 
 usage() {
     echo "Usage: `basename $0` --git giturl [ --wd workdir ] [ --od outdir ]"
@@ -65,6 +67,16 @@ echo "Using working dir $WORKING_DIR" >&2
 
 mkdir -p $WORKING_DIR || abort "Could not create working dir '$WORKING_DIR', exiting."
 mkdir -p $OUTPUT_DIR || abort "Could not create output dir '$OUTPUT_DIR', exiting."
+
+# applying retention policy
+# remove all but $RETENTION_COUNT_WD last working dirs
+pushd $WORKING_DIR
+ls -ct | tail -n +$RETENTION_COUNT_WD | xargs rm -rf
+popd
+# remove all but $RETENTION_COUNT_SRPM last srpms dirs
+pushd $OUTPUT_DIR
+ls -ct | tail -n +$RETENTION_COUNT_SRPM | xargs rm -rf
+popd
 
 GIT_DIR=$(mktemp -d "$WORKING_DIR/gitXXXXXXXX")
 git clone "$GIT_URL" "$GIT_DIR" >&2 || abort "Could not clone git repo '$GIT_URL' to dir '$GIT_DIR'"
