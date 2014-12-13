@@ -1070,28 +1070,32 @@
 			}
 
 
-			#banner form#search {
+			#header form#search {
 				width: 100%;
 				height: inherit;
 				line-height: inherit;
-				position: absolute;
-				right: 1em;
-				top: 1em;
+				//position: relative;
+				right: 25em;
+				top: 0.1em;
 				vertical-align: middle;
 				text-align: right;
-				display: inline-block;
+				display: inline;
 			}
 
-			#banner form#search input, #banner form#search button{
+			#header form#search input, #header form#search button{
 				display: inline-block;
 				position: relative;
 			}
 
-			#banner form#search input {
+			#header form#search input {
+				line-height: 1.25em;
+				height: 2em;
 				width: 20em;
 			}
 
-			#banner form#search button {
+			#header form#search button {
+				line-height: 1.25em;
+				height: 2.5em;
 				width: 5em;
 			}
 
