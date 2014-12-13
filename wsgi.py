@@ -75,7 +75,7 @@ def find(environ):
         status = '404 Not found'
         return report_error(environ, ['Missing argument which to search.'])
     try:
-        srpms = [ os.path.basename(f) for f in glob.glob("{0}/*{1}*src.rpm".format(get_path(environ, OUTPUT_DIR), query.replace(' ', '*'))) ]
+        srpms = [ get_srpm_url(environ, os.path.basename(f)) for f in glob.glob("{0}/*{1}*src.rpm".format(get_path(environ, OUTPUT_DIR), query.replace(' ', '*'))) ]
     except FileNotFoundError:
         srpms = []
     tvalues = {'srpms':srpms, 'headline': 'Search for {0}'.format(query)}
