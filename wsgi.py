@@ -54,7 +54,14 @@ def gen_srpm(environ):
 
     if 'githash' in data:
         args.extend(data['githash'])
-    out_json = subprocess.check_output(args).decode('utf-8')
+    try:
+        out_json = subprocess.check_output(args).decode('utf-8')
+    except CalledProcessError:
+        return report_error(environ,
+                            ['Could not create SRPM from given git repository.',
+                             'Check the link, content of the repository and if '
+                           + 'sources are available in Fedora\'s lookaside cache.',
+                             'Only if everything looks fine, contact author.'])
     response_body = 'raw output: ' + out_json
     try:
         output = json.loads(out_json)
