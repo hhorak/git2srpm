@@ -77,9 +77,10 @@ class myapp(object):
         except KeyError:
             status = '404 Not found'
             self.response_body = self._report_error(['Missing argument "giturl".'])
+            return
 
         if 'githash' in data:
-            args.extend(data['githash'])
+            args.extend(['--hash', data['githash'][0]])
         try:
             out_json = subprocess.check_output(args).decode('utf-8')
         except subprocess.CalledProcessError:
@@ -87,6 +88,7 @@ class myapp(object):
                                        'Check the link, content of the repository and if '
                                      + 'sources are available in Fedora\'s lookaside cache.',
                                        'Only if everything looks fine, contact author.'])
+            return
         response_body = 'raw output: ' + out_json
         try:
             output = json.loads(out_json)
@@ -168,6 +170,7 @@ class myapp(object):
         except (OSError, IOError) as e:
             self.status = '404 Not found'
             self.response_body = self._report_error(['Given path "{}" has not been found.'.format(fullpath) ])
+            return
 
 
 def application(environ, start_response):
