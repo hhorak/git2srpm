@@ -20,6 +20,7 @@ class myapp(object):
         self.ctype = 'text/plain'
         self.status = '200 OK'
         self.response_body = ''
+        self.cache = False
 
     def run_sh(cmd, args):
         """
@@ -163,6 +164,7 @@ class myapp(object):
                 self.ctype = 'application/x-opentype'
             with open(fullpath, fmode) as f:
                 self.response_body = f.read()
+            self.cache = True
         except (OSError, IOError) as e:
             self.status = '404 Not found'
             self.response_body = self._report_error(['Given path "{}" has not been found.'.format(fullpath) ])
@@ -197,6 +199,9 @@ def application(environ, start_response):
         app.action_file()
 
     response_headers = [('Content-Type', app.ctype), ('Content-Length', str(len(app.response_body)))]
+
+    if app.cache:
+        response_headers.append(('Cache-Control', 'public, max-age=86400'))
 
     start_response(app.status, response_headers)
     return [ app.response_body ]
