@@ -43,10 +43,13 @@
 							</section>
 						</div>
 					</div>
-					<form action="gen-srpm" method="get">
+					<form action="gen-srpm" method="get" id="genform">
 					<fieldset>
 						<div align="center">
-						<input type="text" value="https://github.com/project/reponame.git" name="giturl" /><p></p>
+						<label for="giturl">Git URL</label>
+						<input type="text" placeholder="https://github.com/project/reponame.git" name="giturl" id="giturl" /><p></p>
+						<label for="githash">Git hash or branch</label>
+						<input type="text" placeholder="master" name="githash" id="githash" /><p></p>
 						<button type="submit" class="button big special">Generate</button>
 						</div>
 					</fieldset>

@@ -1093,6 +1093,26 @@
 				width: 20em;
 			}
 
+			#header form#search input:focus::-webkit-input-placeholder,
+			form#genform input:focus::-webkit-input-placeholder,
+			#header form#search input:focus:-moz-placeholder, /* Firefox 18- */
+			form#genform input:focus:-moz-placeholder,
+			#header form#search input:focus::-moz-placeholder, /* Firefox 19+ */
+			form#genform input:focus::-moz-placeholder,
+			#header form#search input:focus:-ms-input-placeholder, /* oldIE ;) */
+			form#genform input:focus:-ms-input-placeholder
+			{ color:transparent; }
+
+			form#genform input#giturl
+			{
+				width: 45em;
+			}
+
+			form#genform input#githash
+			{
+				width: 15em;
+			}
+
 			#header form#search button {
 				line-height: 1.25em;
 				height: 2.5em;
