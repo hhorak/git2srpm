@@ -7,7 +7,7 @@ OUTPUT_DIR=.
 GIT_HASH=master
 DIST=".fc21"
 RESULT_FULL_PATH=true
-SCRIPTS_PATH=$(dirname $0)
+SCRIPTS_PATH=$(readlink -f `dirname $0`)
 
 usage() {
     echo "Usage: `basename $0` --git giturl [ --wd workdir ] [ --od outdir ]"
@@ -74,6 +74,15 @@ git checkout "$GIT_HASH" >&2 || abort "Could not checkout 'GIT_HASH'"
 
 touch sources || abort "Could not touch 'sources' file"
 
+# use rpmmacros from redhat-rpm-config so we have all rpm macros available
+macrosfileexists=0
+if [ -f ~/.rpmmacros ] ; then
+    macrosfileexists=1
+else
+    echo "using local copy of rpmmacros file" >&2
+    cp "${SCRIPTS_PATH}/rpmmacros" ~/.rpmmacros
+fi
+
 # This should do the same as
 # fedpkg --dist "$DIST" srpm | tee srpmbuild.log >&2
 $SCRIPTS_PATH/getsource.py | tee srpmbuild.log >&2
@@ -87,6 +96,12 @@ specfile=$(ls *.spec | head -n 1)
                       --define '_topdir .' \
                       --define '_buildrootdir .' \
                       "$specfile"  | tee srpmbuild2.log >&2
+
+# remove rpmmacros if created by this script
+if [ $macrosfileexists -eq 0 ] ; then
+    echo "removing local copy of rpmmacros file" >&2
+    rm -f ~/.rpmmacros
+fi
 
 srpm=$(cat srpmbuild2.log | grep -e '^Wrote: ' | sed -e 's/Wrote: //')
 srpm=$(readlink -f "$srpm")
