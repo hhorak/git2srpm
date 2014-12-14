@@ -21,6 +21,7 @@ class myapp(object):
         self.status = '200 OK'
         self.response_body = ''
         self.cache = False
+        self.api = False
 
 
     def _get_path(self, path):
@@ -42,6 +43,8 @@ class myapp(object):
 
 
     def _get_template(self, filename, tvalues):
+        if self.api:
+            return self._get_json_output(tvalues)
         self.ctype = 'text/html'
         tvalues = self._get_all_pages_values(tvalues)
         env = jinja2.environment.Environment()
@@ -52,16 +55,25 @@ class myapp(object):
 
     def _report_error(self, errors=['Some unspecified error.']):
         tvalues = {'errors': errors}
+        if self.api:
+            return self._get_json_output(tvalues)
         return self._get_template('error.html', tvalues)
 
 
     def _report_info(self, messages=['Some unspecified info.']):
         tvalues = {'messages': messages}
+        if self.api:
+            return self._get_json_output(messages)
         return self._get_template('info.html', tvalues)
 
 
     def _get_srpm_url(self, name):
         return self.environ['wsgi.url_scheme'] + '://' + self.environ['HTTP_HOST'] + '/srpm/' + name
+
+
+    def _get_json_output(self, data):
+        self.ctype = 'text/plain'
+        return json.dumps({'data': data}).encode('utf-8')
 
 
     def action_gen_srpm(self):
@@ -91,10 +103,13 @@ class myapp(object):
             output = json.loads(out_json)
             response_body += output['srpm']
         except (KeyError, ValueError):
-             self.response_body = response_body + 'error parsing json output of git2srpm.sh'
+             self.response_body = self._report_error([response_body + 'error parsing json output of git2srpm.sh'])
 
         final_url = self._get_srpm_url(output['srpm'])
-        self.response_body = self._report_info(['Source RPM generated successfully, use: <a href="{0}">{0}</a>'.format(final_url)])
+        if self.api:
+            self.response_body = self._get_json_output({'result': 1, 'srpm': final_url})
+        else:
+            self.response_body = self._report_info(['Source RPM generated successfully.', 'Use: <a href="{0}">{0}</a>'.format(final_url)])
 
 
     def action_find(self):
@@ -116,13 +131,19 @@ class myapp(object):
 
 
     def action_health(self):
-        self.response_body = "1"
+        if self.api:
+            self.response_body = self._get_json_output("1")
+        else:
+            self.response_body = "1"
 
 
     def action_env(self):
         self.response_body = ['%s: %s' % (key, value)
                              for key, value in sorted(environ.items())]
-        self.response_body = '\n'.join(response_body)
+        if self.api:
+            self.response_body = self._get_json_output(response_body)
+        else:
+            self.response_body = '\n'.join(response_body)
 
 
     def action_get_srpm(self, srpm):
@@ -133,7 +154,7 @@ class myapp(object):
             self.ctype = 'application/octet-stream'
         except (OSError, IOError) as e:
             self.status = '404 Not found'
-            self.response_body = self.report_error(['Given source RPM "{}" has not been found.'.format(srpm) ])
+            self.response_body = self._report_error(['Given source RPM "{}" has not been found.'.format(srpm) ])
 
 
     def action_list(self):
@@ -169,33 +190,44 @@ class myapp(object):
             return
 
 
+    def handle_request(self):
+        if self.environ['PATH_INFO'][0:4] == '/v1/':
+            self.api = True
+            self.handle_action(self.environ['PATH_INFO'][3:])
+        else:
+            self.handle_action(self.environ['PATH_INFO'])
+
+
+    def handle_action(self, path_info):
+        if path_info == '/health':
+            self.action_health()
+
+        elif path_info == '/env':
+            self.action_env()
+
+        elif path_info[0:6] == '/srpm/':
+            self.action_get_srpm(path_info[6:])
+
+        elif path_info[0:5] == '/list':
+            self.action_list()
+
+        elif path_info[0:7] == '/search':
+            self.action_find()
+
+        elif path_info == '/gen-srpm':
+            self.action_gen_srpm()
+
+        elif path_info == '/':
+            self.action_homepage()
+
+        else:
+            self.action_file()
+
+
 def application(environ, start_response):
 
     app = myapp(environ)
-
-    if environ['PATH_INFO'] == '/health':
-        app.action_health()
-
-    elif environ['PATH_INFO'] == '/env':
-        app.action_env()
-
-    elif environ['PATH_INFO'][0:6] == '/srpm/':
-        app.action_get_srpm(environ['PATH_INFO'][6:])
-
-    elif environ['PATH_INFO'][0:5] == '/list':
-        app.action_list()
-
-    elif environ['PATH_INFO'][0:7] == '/search':
-        app.action_find()
-
-    elif environ['PATH_INFO'] == '/gen-srpm':
-        app.action_gen_srpm()
-
-    elif environ['PATH_INFO'] == '/':
-        app.action_homepage()
-
-    else:
-        app.action_file()
+    app.handle_request()
 
     response_headers = [('Content-Type', app.ctype), ('Content-Length', str(len(app.response_body)))]
 
