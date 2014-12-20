@@ -22,6 +22,7 @@ class myapp(object):
         self.response_body = ''
         self.cache = False
         self.api = False
+        self.headers = []
 
 
     def _get_path(self, path):
@@ -76,7 +77,7 @@ class myapp(object):
         return json.dumps({'data': data}).encode('utf-8')
 
 
-    def action_gen_srpm(self):
+    def _action_gen_srpm(self, getfile=False):
         data = urllib.parse.parse_qs(self.environ['QUERY_STRING'])
         try:
             args = [os.path.join(self._get_path('.'), 'git2srpm.sh'),
@@ -105,11 +106,31 @@ class myapp(object):
         except (KeyError, ValueError):
              self.response_body = self._report_error([response_body + 'error parsing json output of git2srpm.sh'])
 
+        # if we want to return the bits as well, do it and end
+        if getfile:
+            self.action_get_srpm(output['srpm'])
+            self.headers.append(('Content-Disposition', 'attachment; filename="{0}"'.format(output['srpm'])))
+            return
+
+        # otherwise return some nice output, depending on if we are
+        # asked for JSON or HTML
         final_url = self._get_srpm_url(output['srpm'])
         if self.api:
             self.response_body = self._get_json_output({'result': 1, 'srpm': final_url})
         else:
             self.response_body = self._report_info(['Source RPM generated successfully.', 'Use: <a href="{0}">{0}</a>'.format(final_url)])
+
+
+    def get_headers(self):
+        ret = [('Content-Type', self.ctype), ('Content-Length', str(len(self.response_body)))]
+        if self.cache:
+            ret.append(('Cache-Control', 'public, max-age=86400'))
+        ret.extend(self.headers)
+        return ret
+
+
+    def action_gen_srpm(self):
+        self._action_gen_srpm(getfile=False)
 
 
     def action_find(self):
@@ -155,6 +176,10 @@ class myapp(object):
         except (OSError, IOError) as e:
             self.status = '404 Not found'
             self.response_body = self._report_error(['Given source RPM "{}" has not been found.'.format(srpm) ])
+
+
+    def action_gen_and_get(self):
+        self._action_gen_srpm(getfile=True)
 
 
     def action_list(self):
@@ -205,17 +230,20 @@ class myapp(object):
         elif path_info == '/env':
             self.action_env()
 
-        elif path_info[0:6] == '/srpm/':
+        elif path_info.startswith('/srpm/'):
             self.action_get_srpm(path_info[6:])
 
-        elif path_info[0:5] == '/list':
+        elif path_info.startswith('/list'):
             self.action_list()
 
-        elif path_info[0:7] == '/search':
+        elif path_info.startswith('/search'):
             self.action_find()
 
         elif path_info == '/gen-srpm':
             self.action_gen_srpm()
+
+        elif path_info.startswith('/gen-and-get'):
+            self.action_gen_and_get()
 
         elif path_info == '/':
             self.action_homepage()
@@ -229,12 +257,7 @@ def application(environ, start_response):
     app = myapp(environ)
     app.handle_request()
 
-    response_headers = [('Content-Type', app.ctype), ('Content-Length', str(len(app.response_body)))]
-
-    if app.cache:
-        response_headers.append(('Cache-Control', 'public, max-age=86400'))
-
-    start_response(app.status, response_headers)
+    start_response(app.status, app.get_headers())
     return [ app.response_body ]
 
 #
