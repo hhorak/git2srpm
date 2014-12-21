@@ -90,6 +90,9 @@ touch sources || abort "Could not touch 'sources' file"
 # fedpkg --dist "$DIST" srpm | tee srpmbuild.log >&2
 $SCRIPTS_PATH/getsource.py | tee srpmbuild.log >&2
 specfile=$(ls *.spec | head -n 1)
+# try alternative way of getting source if not downloaded from lookaside cache
+# just download them if source in spec is a link:
+spectool -g "$specfile" | tee srpmbuild2.log >&2
 # hack with changing HOME so the rpmbuild sees .rpmmacros file
 # in the scripts directory
 HOME=$SCRIPTS_PATH \
